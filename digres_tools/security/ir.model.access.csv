@@ -1,0 +1,4 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_res_partner_digres_tools,res.partner.digres.tools,model_res_partner,base.group_user,1,0,0,0
+access_company_name_history_digres_tools,company.name.history.digres.tools,model_digres_company_name_history,base.group_user,1,1,1,1
+access_record_change_tracker_digres_tools,record.change.tracker.digres.tools,model_digres_record_change_tracker,base.group_user,1,1,1,1
