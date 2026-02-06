@@ -1,5 +1,13 @@
 import { Component } from "@odoo/owl";
 
 export class Playground extends Component {
-    static template = "awesome_owl.playground";
+    static template = "digresjsu.Counter";
+
+    setup() {
+        this.state = useState({ count : 0})
+    }
+
+    increment() {
+        this.state.count++;
+    }
 }
