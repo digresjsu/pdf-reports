@@ -17,4 +17,8 @@
     'version': '0.0.3',
 
     'depends': ['base','account'],
+
+    'data': [
+        'views/res_config_settings_views.xml',
+    ],
 }
