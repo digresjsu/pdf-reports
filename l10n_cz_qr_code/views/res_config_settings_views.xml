@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="res_config_settings_view_form_inherit_qr_code" model="ir.ui.view">
+        <field name="name">res.config.settings.view.form.inherit.qr.code</field>
+        <field name="model">res.config.settings</field>
+        <field name="inherit_id" ref="account.res_config_settings_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//setting[@id='qr_code_invoices']" position="after">
+                <setting
+                    id="l10n_cz_qr_platba"
+                    string="Czech QR Platba"
+                    company_dependent="1"
+                    help="Display Czech QR payment codes (QR Platba) on CZK invoices">
+                    <field name="l10n_cz_qr_code_enabled" class="oe_inline"/>
+                </setting>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>
