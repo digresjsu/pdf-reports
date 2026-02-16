@@ -17,6 +17,16 @@ except ImportError:
     cairosvg = None
     _logger.warning("cairosvg library not found")
 
+try:
+    import qrcode
+    from qrcode.constants import ERROR_CORRECT_L
+    from io import BytesIO
+except ImportError:
+    qrcode = None
+    ERROR_CORRECT_M = None
+    BytesIO = None
+    _logger.warning("qrcode library not found, fallback to qrplatba for QR code generation")
+
 #Inherits
 class AccountMove(models.Model):
     _inherit = 'account.move'
@@ -28,6 +38,7 @@ class AccountMove(models.Model):
     @api.depends('amount_total', 'currency_id', 'partner_id', 'invoice_date_due')
     def _compute_l10n_cz_qr_code(self):
         enabled = self.env['ir.config_parameter'].sudo().get_param('l10n_cz_qr_code.enabled', False)
+
         for move in self:
             move.l10n_cz_qr_code_img = False
             if not enabled:
@@ -80,25 +91,21 @@ class AccountMove(models.Model):
             return False
         if self.payment_state in ('paid', 'in_payment', 'reversed'):
             return False
+        if self.currency_id.name != 'CZK':
+            return False
         if not self.partner_bank_id:
             return False
         return True
     
-    def _l10n_get_variable_symbol(self):
+    def _l10n_cz_get_variable_symbol(self):
         """Return variable symbol for invoice - number"""
         self.ensure_one()
 
         ref = self.payment_reference or self.name or ''
         vs = ''.join(filter(str.isdigit, ref))
         return vs[:10] if vs else None
-    
-    def _l10n_cz_get_qr_settings(self):
-        """Get QR code settings from config parameters"""
-        no_border = self.env['ir.config_parameter'].sudo().get_param('l10n_cz_qr_code.no_border') == 'True'
-        return {
-            'branding': not no_border,
-        }
-    
+
+
     def _l10n_cz_generate_qr_png(self):
         """Generate QR as b64-encoded png"""
         self.ensure_one()
@@ -108,9 +115,9 @@ class AccountMove(models.Model):
             return False
         
         kwargs = {}
-        vs = self._l10n_get_variable_symbol()
+        vs = self._l10n_cz_get_variable_symbol()
         if vs:
-            kwargs['variable_symbol'] = vs
+            kwargs['x_vs'] = vs
 
         if self.invoice_date_due:
             kwargs['due_date'] = fields.Date.to_date(self.invoice_date_due)
@@ -121,29 +128,51 @@ class AccountMove(models.Model):
         if QRPlatbaGenerator is None:
             _logger.warning("qrplatba library not available, cannot generate QR for %s", self.name)
             return False
-        
-        qr_settings = self._l10n_cz_get_qr_settings()
 
         generator = QRPlatbaGenerator(
             account_number,
             self.amount_residual,
             **kwargs,
-            **qr_settings
         )
 
-        img = generator.make_image(box_size=10, border=1)
-        svg_data = img.to_string(encoding='unicode')
+        no_border = self.env['ir.config_parameter'].sudo().get_param(
+            'l10n_cz_qr_code.no_border'
+        ) == 'True'
 
-        if cairosvg is None:
-            _logger.warning("cairosvg library not available, cannot convert SVG to PNG for %s", self.name)
-            return False
+        if no_border:
+            if qrcode is None or ERROR_CORRECT_M is None or BytesIO is None:
+                _logger.warning("qrcode library not available, cannot generate borderless QR for %s", self.name)
+                return False
+            
+            qr = qrcode.QRCode(
+                version=None,
+                error_correction=ERROR_CORRECT_M,
+                box_size=10,
+                border=0,
+            )
+            qr.add_data(generator.get_text())
+            qr.make(fit=True)
 
-        png_data = cairosvg.svg2png(
-            bytestring=svg_data.encode('utf-8'),
-            output_width=200,
-            output_height=200,
-        )
-        if not png_data:
-            _logger.error("Failed to convert SVG to PNG for %s", self.name)
-            return False
-        return base64.b64encode(png_data)
+            img = qr.make_image(fill_color='black', back_color='white')
+            buffer = BytesIO()
+            img.save(buffer, 'PNG')
+            return base64.b64encode(buffer.getvalue())
+        else:
+
+            img = generator.make_image(box_size=10, border=1)
+            svg_data = img.to_string(encoding='unicode')
+
+            if cairosvg is None:
+                _logger.warning("cairosvg library not available, cannot convert SVG to PNG for %s", self.name)
+                return False
+
+            png_data = cairosvg.svg2png(
+                bytestring=svg_data.encode('utf-8'),
+                output_width=200,
+                output_height=200,
+            )
+
+            if not png_data:
+                _logger.error("Failed to convert SVG to PNG for %s", self.name)
+                return False
+            return base64.b64encode(png_data)
