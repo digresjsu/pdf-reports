@@ -22,7 +22,7 @@ class AccountMove(models.Model):
     _inherit = 'account.move'
 
     # fields
-    l10n_cz_qr_code_img = fields.Binary(string="QR Code Image", compute="_compute_l10n_cz_qr_code")
+    l10n_cz_qr_code_img = fields.Binary(string="QR Code Image", compute="_compute_l10n_cz_qr_code", store=True)
 
     #Compute final QR
     @api.depends('amount_total', 'currency_id', 'partner_id', 'invoice_date_due')
@@ -63,7 +63,7 @@ class AccountMove(models.Model):
             base_number = iban[14:24].lstrip('0')
 
             if prefix:
-                return f"{prefix}/{bank_code}"
+                return f"{prefix}-{base_number}/{bank_code}"
             return f"{base_number}/{bank_code}"
         
         return None
