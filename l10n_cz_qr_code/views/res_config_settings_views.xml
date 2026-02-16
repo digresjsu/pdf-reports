@@ -15,6 +15,9 @@
                     <field name="l10n_cz_qr_code_enabled"/>
                     <div class="mt-3" invisible="not l10n_cz_qr_code_enabled">
                         <field name="l10n_cz_qr_code_no_border" string="Generate without branding"/>
+                        <div>
+                            <label for="l10n_cz_qr_code_no_border"/><br/>
+                        </div>
                     </div>
                 </setting>
             </xpath>
