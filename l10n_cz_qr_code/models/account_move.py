@@ -19,11 +19,11 @@ except ImportError:
 
 try:
     import qrcode
-    from qrcode.constants import ERROR_CORRECT_L
+    from qrcode.constants import ERROR_CORRECT_M as QR_ERROR_CORRECT
     from io import BytesIO
 except ImportError:
     qrcode = None
-    ERROR_CORRECT_M = None
+    QR_ERROR_CORRECT = None #type: ignore
     BytesIO = None
     _logger.warning("qrcode library not found, fallback to qrplatba for QR code generation")
 
@@ -62,7 +62,7 @@ class AccountMove(models.Model):
         self.ensure_one()
         bank_acc = self.partner_bank_id
 
-        # Czech format 1234567890/0100
+        # Czech format 19-1234567890/0100
         if bank_acc.acc_number and '/' in bank_acc.acc_number:
             return bank_acc.acc_number.strip()
         
@@ -140,13 +140,13 @@ class AccountMove(models.Model):
         ) == 'True'
 
         if no_border:
-            if qrcode is None or ERROR_CORRECT_M is None or BytesIO is None:
+            if qrcode is None or QR_ERROR_CORRECT is None or BytesIO is None:
                 _logger.warning("qrcode library not available, cannot generate borderless QR for %s", self.name)
                 return False
             
             qr = qrcode.QRCode(
                 version=None,
-                error_correction=ERROR_CORRECT_M,
+                error_correction=QR_ERROR_CORRECT,
                 box_size=10,
                 border=0,
             )
