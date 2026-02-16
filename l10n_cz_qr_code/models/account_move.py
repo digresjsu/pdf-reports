@@ -39,6 +39,7 @@ class AccountMove(models.Model):
                 png_data = move._l10n_cz_generate_qr_png()
                 if png_data:
                     move.l10n_cz_qr_code_img = png_data
+                    _logger.info("Generated QR code for %s", move.name)
             except Exception as e:
                 _logger.error("Error generating QR code for %s: %s", move.name, str(e))
                 move.l10n_cz_qr_code_img = False
