@@ -12,7 +12,7 @@ class ChangeTrackerMixin(models.AbstractModel):
     #Po uložení zkontroluje hodnoty polí a pokud se změnily, každá změna vytvoří záznam v tabulce
     def write(self, vals):
         # ukáže se v .sh logu
-        _logger.info('=== WRITE CALLED === vals: %s', vals)
+        # _logger.info('=== WRITE CALLED === vals: %s', vals)
         old_value = {}
         for rec in self:
             old_value[rec.id] = {}

@@ -10,3 +10,8 @@ class ResConfigSettings(models.TransientModel):
         config_parameter='l10n_cz_qr_code.enabled',
         )
     
+    l10n_cz_qr_code_no_border = fields.Boolean(
+        string="Generate without border",
+        default=False,
+        config_parameter='l10n_cz_qr_code.no_border',
+    )

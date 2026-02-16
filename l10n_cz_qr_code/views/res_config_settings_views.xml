@@ -14,6 +14,14 @@
                     help="Display Czech QR payment codes (QR Platba) on CZK invoices">
                     <field name="l10n_cz_qr_code_enabled" class="oe_inline"/>
                 </setting>
+                <setting
+                    id="l10n_cz_qr_no_border"
+                    string="Generate without border"
+                    company_dependent="1"
+                    help="Generate QR codes without the standard border"
+                    invisible="not l10n_cz_qr_code_enabled">
+                    <field name="l10n_cz_qr_code_no_border" class="oe_inline"/>
+                </setting>
             </xpath>
         </field>
     </record>
