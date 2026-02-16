@@ -92,6 +92,13 @@ class AccountMove(models.Model):
         vs = ''.join(filter(str.isdigit, ref))
         return vs[:10] if vs else None
     
+    def _l10n_cz_get_qr_settings(self):
+        """Get QR code settings from config parameters"""
+        no_border = self.env['ir.config_parameter'].sudo().get_param('l10n_cz_qr_code.no_border') == 'True'
+        return {
+            'branding': not no_border,
+        }
+    
     def _l10n_cz_generate_qr_png(self):
         """Generate QR as b64-encoded png"""
         self.ensure_one()
@@ -114,11 +121,14 @@ class AccountMove(models.Model):
         if QRPlatbaGenerator is None:
             _logger.warning("qrplatba library not available, cannot generate QR for %s", self.name)
             return False
+        
+        qr_settings = self._l10n_cz_get_qr_settings()
 
         generator = QRPlatbaGenerator(
             account_number,
             self.amount_residual,
             **kwargs,
+            **qr_settings
         )
 
         img = generator.make_image(box_size=10, border=1)
