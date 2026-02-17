@@ -14,11 +14,12 @@
     'images': ['static/description/icon.png'],
     'installable': True,
     'category': 'Accounting/Localization',
-    'version': '0.0.3',
+    'version': '0.0.5',
 
     'depends': ['base','account'],
 
     'data': [
         'views/res_config_settings_views.xml',
+        'views/l10n_cz_qr_code_templates.xml',
     ],
 }

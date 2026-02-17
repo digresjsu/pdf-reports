@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <template id="l10n_cz_invoice_qr_code" name="Czech QR payment" inherit_id="account.report_invoice_document">
+        <xpath expr="//div[@id='payment_term']" position="after">
+            <t t-if="o.l10n_cz_qr_code_img">
+                <div class="row mt-3 mb-2">
+                    <div class="col-4">
+                        <p class="mb-1"><strong>QR Platba:</strong></p>
+                        <img t-att-src="image_data_uri(o.l10n_cz_qr_code_img)"
+                             style="width:150px;height:150px;"
+                             alt="QR Platba"/>
+                    </div>
+                </div>
+            </t>
+        </xpath>
+    </template>
+
+</odoo>

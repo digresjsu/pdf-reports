@@ -105,7 +105,6 @@ class AccountMove(models.Model):
         vs = ''.join(filter(str.isdigit, ref))
         return vs[:10] if vs else None
 
-
     def _l10n_cz_generate_qr_png(self):
         """Generate QR as b64-encoded png"""
         self.ensure_one()
@@ -150,6 +149,7 @@ class AccountMove(models.Model):
                 box_size=10,
                 border=0,
             )
+
             qr.add_data(generator.get_text())
             qr.make(fit=True)
 
