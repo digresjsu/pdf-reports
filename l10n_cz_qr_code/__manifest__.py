@@ -20,6 +20,6 @@
 
     'data': [
         'views/res_config_settings_views.xml',
-        'views/l10n_cz_qr_code_templates.xml',
+        'views/l10n_cz_invoice_qr_template.xml',
     ],
 }
