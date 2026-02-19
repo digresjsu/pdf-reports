@@ -51,6 +51,7 @@ class AccountMove(models.Model):
                 if png_data:
                     move.l10n_cz_qr_code_img = png_data
                     _logger.info("Generated QR code for %s", move.name)
+                    _logger.info("Generated with values %s", )
             except Exception as e:
                 _logger.error("Error generating QR code for %s: %s", move.name, str(e))
                 move.l10n_cz_qr_code_img = False
@@ -156,6 +157,7 @@ class AccountMove(models.Model):
             img = qr.make_image(fill_color='black', back_color='white')
             buffer = BytesIO()
             img.save(buffer, 'PNG')
+            _logger.info("Generating QR with values %s %s %s", account_number, self.residual_amount, kwargs)
             return base64.b64encode(buffer.getvalue())
         else:
 
@@ -175,4 +177,5 @@ class AccountMove(models.Model):
             if not png_data:
                 _logger.error("Failed to convert SVG to PNG for %s", self.name)
                 return False
+            _logger.info("Generating QR with values %s %s %s", account_number, self.residual_amount, kwargs)
             return base64.b64encode(png_data)

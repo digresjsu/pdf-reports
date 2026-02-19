@@ -6,7 +6,7 @@
             <t t-if="o.l10n_cz_qr_code_img">
                 <div class="row mt-3 mb-2">
                     <div class="col-4">
-                        <p class="mb-1"><strong>QR Platba:</strong></p>
+                        <p class="mb-1"><strong>Naskenujte Vaší bankovní aplikací</strong></p>
                         <img t-att-src="image_data_uri(o.l10n_cz_qr_code_img)"
                              style="width:150px;height:150px;"
                              alt="QR Platba"/>
