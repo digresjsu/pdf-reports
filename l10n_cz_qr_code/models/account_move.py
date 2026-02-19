@@ -83,7 +83,7 @@ class AccountMove(models.Model):
         # return None
         self.ensure_one()
         bank_acc = self.partner_bank_id
-        return bank_acc.sanitized_acc_number or bank_acc.acc_number or None
+        return bank_acc.acc_number or bank_acc.sanitized_acc_number or None
 
     def _l10n_cz_can_generate_qr_code(self):
         """Check if QR code can be generated for current invoice"""
