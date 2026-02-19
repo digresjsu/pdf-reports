@@ -17,6 +17,7 @@ except ImportError:
     cairosvg = None
     _logger.warning("cairosvg library not found")
 
+#Imports for borderless QR
 try:
     import qrcode
     from qrcode.constants import ERROR_CORRECT_M as QR_ERROR_CORRECT
@@ -34,9 +35,9 @@ class AccountMove(models.Model):
     # fields
     l10n_cz_qr_code_img = fields.Binary(string="QR Code Image", compute="_compute_l10n_cz_qr_code", store=True)
 
-    #Compute final QR
     @api.depends('amount_total', 'currency_id', 'partner_id', 'invoice_date_due')
     def _compute_l10n_cz_qr_code(self):
+        """Compute final QR code"""
         enabled = self.env['ir.config_parameter'].sudo().get_param('l10n_cz_qr_code.enabled', False)
 
         for move in self:
@@ -50,9 +51,9 @@ class AccountMove(models.Model):
                 png_data = move._l10n_cz_generate_qr_png()
                 if png_data:
                     move.l10n_cz_qr_code_img = png_data
-                    _logger.info("Generated QR code for %s", move.name)
+                    _logger.info("CZQR: Generated QR code for %s", move.name)
             except Exception as e:
-                _logger.error("Error generating QR code for %s: %s", move.name, str(e))
+                _logger.error("CZQR: Error generating QR code for %s: %s", move.name, str(e))
                 move.l10n_cz_qr_code_img = False
 
     def _l10n_cz_get_account_number(self):
@@ -70,6 +71,7 @@ class AccountMove(models.Model):
         iban = iban.replace(' ', '').upper()
 
         if iban.startswith('CZ') and len(iban) == 24:
+            _logger.info("CZQR: Found IBAN format in account number %s", iban)
             bank_code = iban[4:8]
             prefix = iban[8:14].lstrip('0')
             base_number = iban[14:24].lstrip('0')
@@ -110,7 +112,7 @@ class AccountMove(models.Model):
         self.ensure_one()
         account_number = self._l10n_cz_get_account_number()
         if not account_number:
-            _logger.info("No valid Czech account number for %s", self.name)
+            _logger.info("CZQR: No valid Czech account number for %s", self.name)
             return False
         
         kwargs = {}
@@ -125,7 +127,7 @@ class AccountMove(models.Model):
             kwargs['message'] = self.ref[:60]
 
         if QRPlatbaGenerator is None:
-            _logger.warning("qrplatba library not available, cannot generate QR for %s", self.name)
+            _logger.warning("CZQR: qrplatba library not available, cannot generate QR for %s", self.name)
             return False
 
         generator = QRPlatbaGenerator(
@@ -138,9 +140,10 @@ class AccountMove(models.Model):
             'l10n_cz_qr_code.no_border'
         ) == 'True'
 
+        # Borderless QR
         if no_border:
             if qrcode is None or QR_ERROR_CORRECT is None or BytesIO is None:
-                _logger.warning("qrcode library not available, cannot generate borderless QR for %s", self.name)
+                _logger.warning("CZQR: qrcode library not available, cannot generate borderless QR for %s", self.name)
                 return False
             
             qr = qrcode.QRCode(
@@ -156,15 +159,15 @@ class AccountMove(models.Model):
             img = qr.make_image(fill_color='black', back_color='white')
             buffer = BytesIO()
             img.save(buffer, 'PNG')
-            _logger.info("Generating QR with values %s %s %s", account_number, self.amount_residual, kwargs)
+            _logger.info("CZQR: Generated QR with values %s %s %s", account_number, self.amount_residual, kwargs)
             return base64.b64encode(buffer.getvalue())
+        
         else:
-
-            img = generator.make_image(box_size=10, border=1)
+            img = generator.make_image(box_size=5, border=1)
             svg_data = img.to_string(encoding='unicode')
 
             if cairosvg is None:
-                _logger.warning("cairosvg library not available, cannot convert SVG to PNG for %s", self.name)
+                _logger.warning("CZQR: cairosvg library not available, cannot convert SVG to PNG for %s", self.name)
                 return False
 
             png_data = cairosvg.svg2png(
@@ -174,7 +177,7 @@ class AccountMove(models.Model):
             )
 
             if not png_data:
-                _logger.error("Failed to convert SVG to PNG for %s", self.name)
+                _logger.error("CZQR: Failed to convert SVG to PNG for %s", self.name)
                 return False
-            _logger.info("Generating QR with values %s %s %s", account_number, self.amount_residual, kwargs)
+            _logger.info("CZQR: Generated QR with values %s %s %s", account_number, self.amount_residual, kwargs)
             return base64.b64encode(png_data)
