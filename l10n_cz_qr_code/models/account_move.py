@@ -57,32 +57,11 @@ class AccountMove(models.Model):
                 move.l10n_cz_qr_code_img = False
 
     def _l10n_cz_get_account_number(self):
-        """Get account number from odoo database, supports different formats
-        1234567890/0100, CZ1501001111002212345678"""
-
-        # self.ensure_one()
-        # bank_acc = self.partner_bank_id
-
-        # # Czech format 19-1234567890/0100
-        # if bank_acc.acc_number and '/' in bank_acc.acc_number:
-        #     return bank_acc.acc_number.strip()
-        
-        # iban = bank_acc.sanitized_acc_number or bank_acc.acc_number or ''
-        # iban = iban.replace(' ', '').upper()
-
-        # if iban.startswith('CZ') and len(iban) == 24:
-        #     _logger.info("CZQR: Found IBAN format in account number %s", iban)
-        #     bank_code = iban[4:8]
-        #     prefix = iban[8:14].lstrip('0')
-        #     base_number = iban[14:24].lstrip('0')
-
-        #     if prefix:
-        #         return f"{prefix}-{base_number}/{bank_code}"
-        #     return f"{base_number}/{bank_code}"
-        
-        # return None
+        """Get current record account number"""
         self.ensure_one()
         bank_acc = self.partner_bank_id
+        
+        # Sanitized only as a fallback, doesn't work well with prefix and / 
         return bank_acc.acc_number or bank_acc.sanitized_acc_number or None
 
     def _l10n_cz_can_generate_qr_code(self):
