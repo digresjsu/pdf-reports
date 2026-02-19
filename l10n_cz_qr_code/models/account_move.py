@@ -35,7 +35,7 @@ class AccountMove(models.Model):
     # fields
     l10n_cz_qr_code_img = fields.Binary(string="QR Code Image", compute="_compute_l10n_cz_qr_code", store=True)
 
-    @api.depends('amount_total', 'currency_id', 'partner_id', 'invoice_date_due')
+    @api.depends('amount_total', 'currency_id', 'partner_id', 'invoice_date_due', 'amount_residual', 'payment_reference', 'ref')
     def _compute_l10n_cz_qr_code(self):
         """Compute final QR code"""
         enabled = self.env['ir.config_parameter'].sudo().get_param('l10n_cz_qr_code.enabled', False)
