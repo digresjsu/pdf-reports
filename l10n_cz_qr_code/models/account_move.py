@@ -156,7 +156,7 @@ class AccountMove(models.Model):
             img = qr.make_image(fill_color='black', back_color='white')
             buffer = BytesIO()
             img.save(buffer, 'PNG')
-            _logger.info("Generating QR with values %s %s %s", account_number, self.residual_amount, kwargs)
+            _logger.info("Generating QR with values %s %s %s", account_number, self.amount_residual, kwargs)
             return base64.b64encode(buffer.getvalue())
         else:
 
@@ -176,5 +176,5 @@ class AccountMove(models.Model):
             if not png_data:
                 _logger.error("Failed to convert SVG to PNG for %s", self.name)
                 return False
-            _logger.info("Generating QR with values %s %s %s", account_number, self.residual_amount, kwargs)
+            _logger.info("Generating QR with values %s %s %s", account_number, self.amount_residual, kwargs)
             return base64.b64encode(png_data)
