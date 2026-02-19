@@ -60,27 +60,30 @@ class AccountMove(models.Model):
         """Get account number from odoo database, supports different formats
         1234567890/0100, CZ1501001111002212345678"""
 
+        # self.ensure_one()
+        # bank_acc = self.partner_bank_id
+
+        # # Czech format 19-1234567890/0100
+        # if bank_acc.acc_number and '/' in bank_acc.acc_number:
+        #     return bank_acc.acc_number.strip()
+        
+        # iban = bank_acc.sanitized_acc_number or bank_acc.acc_number or ''
+        # iban = iban.replace(' ', '').upper()
+
+        # if iban.startswith('CZ') and len(iban) == 24:
+        #     _logger.info("CZQR: Found IBAN format in account number %s", iban)
+        #     bank_code = iban[4:8]
+        #     prefix = iban[8:14].lstrip('0')
+        #     base_number = iban[14:24].lstrip('0')
+
+        #     if prefix:
+        #         return f"{prefix}-{base_number}/{bank_code}"
+        #     return f"{base_number}/{bank_code}"
+        
+        # return None
         self.ensure_one()
         bank_acc = self.partner_bank_id
-
-        # Czech format 19-1234567890/0100
-        if bank_acc.acc_number and '/' in bank_acc.acc_number:
-            return bank_acc.acc_number.strip()
-        
-        iban = bank_acc.sanitized_acc_number or bank_acc.acc_number or ''
-        iban = iban.replace(' ', '').upper()
-
-        if iban.startswith('CZ') and len(iban) == 24:
-            _logger.info("CZQR: Found IBAN format in account number %s", iban)
-            bank_code = iban[4:8]
-            prefix = iban[8:14].lstrip('0')
-            base_number = iban[14:24].lstrip('0')
-
-            if prefix:
-                return f"{prefix}-{base_number}/{bank_code}"
-            return f"{base_number}/{bank_code}"
-        
-        return None
+        return bank_acc.sanitized_acc_number or bank_acc.acc_number or None
 
     def _l10n_cz_can_generate_qr_code(self):
         """Check if QR code can be generated for current invoice"""
