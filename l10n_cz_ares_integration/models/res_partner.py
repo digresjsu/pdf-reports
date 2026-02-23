@@ -38,6 +38,15 @@ class ResPartner(models.Model):
             vals['name'] = data['obchodniJmeno']
         if data.get('dic'):
             vals['vat'] = data['dic']
+        
+        street = data.get('sidlo', {})
+        if street.get('nazevUlice'):
+            if street.get('cisloDomovni'):
+                vals['street'] = f"{street['nazevUlice']} {street['cisloDomovni']}"
+            else:
+                vals['street'] = street['nazevUlice']
+        if street.get('psc'):
+            vals['zip'] = street['psc']
         return vals
 
     # ------------------------------------------------------------------
