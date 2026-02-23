@@ -28,7 +28,6 @@ except ImportError:
     BytesIO = None
     _logger.warning("qrcode library not found, fallback to qrplatba for QR code generation")
 
-#Inherits
 class AccountMove(models.Model):
     _inherit = 'account.move'
 
@@ -61,8 +60,7 @@ class AccountMove(models.Model):
         self.ensure_one()
         bank_acc = self.partner_bank_id
         
-        # Sanitized only as a fallback, doesn't work well with prefix and / 
-        return bank_acc.acc_number or bank_acc.sanitized_acc_number or None
+        return bank_acc.acc_number or None
 
     def _l10n_cz_can_generate_qr_code(self):
         """Check if QR code can be generated for current invoice"""
