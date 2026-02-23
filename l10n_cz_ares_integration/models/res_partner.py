@@ -86,6 +86,7 @@ class ResPartner(models.Model):
                 'message': _("Partner data updated from ARES."),
                 'sticky': False,
                 'type': 'success',
+                'next': {'type': 'ir.actions.client', 'tag': 'reload'},
             }
         }
 
