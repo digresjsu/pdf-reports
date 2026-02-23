@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 {
-    'name': "Digital Resources",
+    'name': "DIG ARES Integration",
 
     'summary': """
         ARES integration for czech subjects""",
@@ -15,11 +15,9 @@
     'installable': True,
     'version': '0.0.1',
 
-    'depends': ['base'],
+    'depends': ['base', 'contacts'],
 
     'data': [
         'views/res_partner_views.xml',
-        'views/res_config_settings_views.xml',
-        'views/l10n_cz_invoice_qr_template.xml',
     ],
 }
