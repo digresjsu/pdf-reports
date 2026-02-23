@@ -78,17 +78,6 @@ class ResPartner(models.Model):
             vals = partner._ares_data(data)
             if vals:
                 partner.with_context(_ares_sync=True).write(vals)
-        return {
-            'type': 'ir.actions.client',
-            'tag': 'display_notification',
-            'params': {
-                'title': _("ARES"),
-                'message': _("Partner data updated from ARES."),
-                'sticky': False,
-                'type': 'success',
-                'next': {'type': 'ir.actions.client', 'tag': 'reload'},
-            }
-        }
 
     def write(self, vals):
         result = super().write(vals)
