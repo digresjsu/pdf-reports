@@ -42,11 +42,22 @@ class ResPartner(models.Model):
         street = data.get('sidlo', {})
         if street.get('nazevUlice'):
             if street.get('cisloDomovni'):
-                vals['street'] = f"{street['nazevUlice']} {street['cisloDomovni']}"
+                if street.get('orientacniCislo'):
+                    vals['street'] = f"{street['nazevUlice']} {street['cisloDomovni']}/{street['orientacniCislo']}"
+                else:
+                    vals['street'] = f"{street['nazevUlice']} {street['cisloDomovni']}"
             else:
                 vals['street'] = street['nazevUlice']
         if street.get('psc'):
             vals['zip'] = street['psc']
+        if street.get('nazevObce'):
+            vals['city'] = street['nazevObce']
+        
+        if street.get('kodStatu'):
+            country = self.env['res.country'].search([('code', '=', street['kodStatu'])], limit=1)
+            if country:
+                vals['country_id'] = country.id
+
         return vals
 
     # ------------------------------------------------------------------

@@ -8,7 +8,7 @@
             <xpath expr="/form//div[@name='warning_tax']" position="before">
                 <header>
                     <button name="action_fetch_from_ares"
-                            string="Fetch from ARES"
+                            string="ARES"
                             type="object"
                             invisible="not vat"/>
                 </header>
